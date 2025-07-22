@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Logi-Crew Connect v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #2c2c2c;
+            color: #1a1a1a;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* Phone Container */
+        .phone-container {
+            width: 500px;
+            height: 850px;
+            background-color: #fffef5;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            border-radius: 40px;
+            border: 8px solid #1a1a1a;
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            padding-bottom: 70px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d0000 100%);
+            color: #fffef5;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fffef5;
+        }
+        
+        .role-switcher {
+            background: rgba(255,254,245,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fff8dc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            border: 2px solid #8b0000;
+        }
+        
+        .user-details h2 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #fffef5;
+        }
+        
+        .skill-level {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #FFD700;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        /* Navigation - 4 tabs instead of 5 */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fffef5;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-top: 1px solid #f0e68c;
+            width: 500px;
+            margin: 0 auto;
+            border-radius: 0 0 32px 32px;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #2d0000;
+            text-decoration: none;
+            font-size: 12px;
+            padding: 5px;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #8b0000;
+            font-weight: 600;
+        }
+        
+        .nav-item.active .nav-icon {
+            transform: scale(1.2);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 3px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Main Content */
+        .page {
+            display: none;
+            padding: 20px;
+            min-height: calc(850px - 200px);
+            background-color: #fffef5;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .section-action {
+            color: #8b0000;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        
+        /* Improved Job Cards */
+        .job-card {
+            background: #fff;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid #f0e68c;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .job-card:active {
+            transform: scale(0.98);
+        }
+        
+        .job-card-urgent {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #FF6347;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .countdown {
+            font-weight: 700;
+        }
+        
+        .job-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: linear-gradient(45deg, #f0e68c, #fff8dc);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #8b0000;
+        }
+        
+        .job-content {
+            padding: 15px;
+        }
+        
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .facility-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            flex: 1;
+        }
+        
+        .job-wage-container {
+            text-align: right;
+        }
+        
+        .job-wage {
+            font-size: 20px;
+            font-weight: 700;
+            color: #8b0000;
+        }
+        
+        .wage-badge {
+            background: #FFD700;
+            color: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+            display: inline-block;
+        }
+        
+        .job-details {
+            font-size: 14px;
+            color: #2d0000;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .job-match {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .match-score {
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .match-reasons {
+            margin-top: 5px;
+            color: #388e3c;
+        }
+        
+        .job-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .job-tag {
+            padding: 5px 12px;
+            background: #fffef5;
+            border-radius: 20px;
+            font-size: 12px;
+            border: 1px solid #8b0000;
+            transition: all 0.2s ease;
+        }
+        
+        .job-tag.hot {
+            background: #8b0000;
+            color: #fffef5;
+            border: none;
+        }
+        
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .save-button {
+            padding: 10px 20px;
+            background: #fff;
+            color: #8b0000;
+            border: 2px solid #8b0000;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .apply-button {
+            flex: 1;
+            padding: 12px;
+            background: #8b0000;
+            color: #fffef5;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .apply-button:hover {
+            background: #a52a2a;
+        }
+        
+        /* AI Recommendations Section */
+        .ai-section {
+            background: linear-gradient(135deg, #8b0000 0%, #2d0000 100%);
+            color: #fffef5;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .ai-icon {
+            font-size: 24px;
+        }
+        
+        .ai-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* Horizontal Scroll Section */
+        .horizontal-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin: 0 -20px;
+            padding: 0 20px 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scroll-card {
+            min-width: 280px;
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #f0e68c;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8b0000;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #2d0000;
+        }
+        
+        .stat-trend {
+            font-size: 12px;
+            color: #228b22;
+            margin-top: 5px;
+        }
+        
+        /* Community Section */
+        .community-card {
+            background: #fff8dc;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #f0e68c;
+        }
+        
+        .community-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .community-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #8b0000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .community-user {
+            flex: 1;
+        }
+        
+        .community-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .community-role {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .community-rating {
+            color: #FFD700;
+        }
+        
+        .community-content {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2d0000;
+        }
+        
+        .community-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        /* Wallet Page Improvements */
+        .wallet-balance {
+            background: linear-gradient(135deg, #8b0000 0%, #2d0000 100%);
+            color: #fffef5;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallet-balance::after {
+            content: '¥';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            font-size: 120px;
+            opacity: 0.1;
+        }
+        
+        .balance-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .wallet-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .wallet-button {
+            padding: 12px;
+            background: rgba(255,254,245,0.2);
+            color: #fffef5;
+            border: 1px solid rgba(255,254,245,0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .wallet-button:hover {
+            background: rgba(255,254,245,0.3);
+        }
+        
+        /* Financial Services */
+        .financial-services {
+            background: #fff8dc;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #f0e68c;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .service-item {
+            background: #fffef5;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .service-item:hover {
+            border-color: #8b0000;
+            transform: translateY(-2px);
+        }
+        
+        .service-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .service-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .service-desc {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Performance Dashboard */
+        .performance-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #f0e68c;
+        }
+        
+        .performance-chart {
+            height: 150px;
+            background: linear-gradient(to top, rgba(139,0,0,0.1), transparent);
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            padding: 10px;
+        }
+        
+        .chart-bar {
+            width: 30px;
+            background: #8b0000;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Skills Progress with Animation */
+        .skill-item {
+            margin-bottom: 20px;
+        }
+        
+        .skill-name {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            color: #2d0000;
+        }
+        
+        .skill-progress {
+            height: 8px;
+            background: #f0e68c;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8b0000, #FFD700);
+            transition: width 1s ease;
+            position: relative;
+        }
+        
+        .skill-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Badge System */
+        .badge-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .achievement-badge {
+            background: #FFD700;
+            color: #1a1a1a;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .achievement-badge.locked {
+            background: #ccc;
+            color: #666;
+        }
+        
+        /* Modal Improvements */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: #fffef5;
+            width: 90%;
+            max-width: 460px;
+            border-radius: 20px;
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid #f0e68c;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #8b0000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .close-button:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0e68c 25%, #fff8dc 50%, #f0e68c 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 10px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Notification Toast */
+        .notification {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #228b22;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 300;
+            max-width: 90%;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100px); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+        
+        /* Pull to Refresh */
+        .pull-to-refresh {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #8b0000;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .pull-to-refresh.active {
+            top: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 520px) {
+            .phone-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .nav-bar {
+                width: 100%;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-screen" id="phoneScreen">
+            <!-- Pull to Refresh Indicator -->
+            <div class="pull-to-refresh" id="pullToRefresh">↻</div>
+            
+            <!-- Header -->
+            <div class="header">
+                <div class="header-top">
+                    <h1>Logi-Crew Connect</h1>
+                    <div class="role-switcher" onclick="showRoleSwitcher()">
+                        <span>ワーカー</span>
+                        <span>▼</span>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">👷</div>
+                    <div class="user-details">
+                        <h2>田中 太郎</h2>
+                        <span class="skill-level">中級 - フォークリフト認定</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Home Page -->
+            <div id="home" class="page active">
+                <!-- AI Recommendations -->
+                <div class="ai-section">
+                    <div class="ai-header">
+                        <span class="ai-icon">🤖</span>
+                        <span class="ai-title">あなたにピッタリの仕事</span>
+                    </div>
+                    <div class="horizontal-scroll">
+                        <div class="scroll-card">
+                            <div class="job-card-urgent">
+                                <span>緊急</span>
+                                <span class="countdown">02:45</span>
+                            </div>
+                            <div class="job-image">🏭</div>
+                            <div class="job-content">
+                                <div class="job-match">
+                                    <div class="match-score">マッチ度: 95%</div>
+                                    <div class="match-reasons">
+                                        ✓ スキル完全一致<br>
+                                        ✓ 自宅から15分<br>
+                                        ✓ 希望時給以上
+                                    </div>
+                                </div>
+                                <div class="job-header">
+                                    <h3 class="facility-name">東京ロジスティクスセンター A棟</h3>
+                                </div>
+                                <div class="job-wage-container">
+                                    <div class="job-wage">¥1,500/時</div>
+                                    <div class="wage-badge">時給UP中 +10%</div>
+                                </div>
+                                <button class="apply-button" onclick="quickApply('job1')">1タップで応募</button>
+                            </div>
+                        </div>
+                        
+                        <div class="scroll-card">
+                            <div class="job-image">📦</div>
+                            <div class="job-content">
+                                <div class="job-match">
+                                    <div class="match-score">マッチ度: 88%</div>
+                                </div>
+                                <div class="job-header">
+                                    <h3 class="facility-name">横浜配送センター</h3>
+                                </div>
+                                <div class="job-wage-container">
+                                    <div class="job-wage">¥1,350/時</div>
+                                </div>
+                                <button class="apply-button" onclick="quickApply('job2')">1タップで応募</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-card" onclick="showPage('work')">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value">42日</div>
+                        <div class="stat-label">今月の勤務</div>
+                        <div class="stat-trend">▲ 前月比+3日</div>
+                    </div>
+                    <div class="stat-card" onclick="showPage('wallet')">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-value">¥248,500</div>
+                        <div class="stat-label">今月の収入</div>
+                        <div class="stat-trend">▲ 前月比+15%</div>
+                    </div>
+                    <div class="stat-card" onclick="showPage('mypage')">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">平均評価</div>
+                    </div>
+                    <div class="stat-card" onclick="showPage('mypage')">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">スキル進捗</div>
+                    </div>
+                </div>
+
+                <!-- Urgent Jobs Section -->
+                <div class="section-header">
+                    <h3 class="section-title">🔥 緊急募集</h3>
+                    <a href="#" class="section-action" onclick="showPage('work')">もっと見る →</a>
+                </div>
+                
+                <div class="job-card" onclick="showJobDetails('urgent1')">
+                    <div class="job-card-urgent">
+                        <span>残り2枠</span>
+                        <span class="countdown">01:30</span>
+                    </div>
+                    <div class="job-content">
+                        <div class="job-header">
+                            <h3 class="facility-name">千葉物流パーク</h3>
+                            <div class="job-wage-container">
+                                <div class="job-wage">¥1,800/時</div>
+                                <div class="wage-badge">夜勤手当25%</div>
+                            </div>
+                        </div>
+                        <div class="job-details">
+                            <p>📍 千葉県市川市塩浜2-20</p>
+                            <p>📅 今夜 20:00-05:00</p>
+                            <p>👥 募集人数: 残り2名</p>
+                        </div>
+                        <div class="job-tags">
+                            <span class="job-tag hot">大至急</span>
+                            <span class="job-tag">夜勤手当</span>
+                            <span class="job-tag">リーダー候補</span>
+                        </div>
+                        <div class="job-actions">
+                            <button class="save-button" onclick="saveJob('urgent1')">❤️</button>
+                            <button class="apply-button" onclick="quickApply('urgent1')">即応募</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community Section -->
+                <div class="section-header">
+                    <h3 class="section-title">💬 施設の声</h3>
+                </div>
+                
+                <div class="community-card">
+                    <div class="community-header">
+                        <div class="community-avatar">田</div>
+                        <div class="community-user">
+                            <div class="community-name">田中さん</div>
+                            <div class="community-role">先輩ワーカー・リーダー</div>
+                        </div>
+                        <div class="community-rating">⭐⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="community-content">
+                        「東京ロジスティクスセンターは休憩室が広くて清潔。スタッフ同士の雰囲気も良く、初心者でも働きやすい環境です。」
+                    </div>
+                    <div class="community-time">2日前</div>
+                </div>
+            </div>
+
+            <!-- Work Page -->
+            <div id="work" class="page">
+                <!-- Search and Filter -->
+                <div class="section-header">
+                    <h3 class="section-title">仕事を探す</h3>
+                    <a href="#" class="section-action" onclick="showFilters()">絞り込み</a>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #f0e68c; padding-bottom: 10px;">
+                    <button class="tab-button active" onclick="switchTab('recommended')">おすすめ</button>
+                    <button class="tab-button" onclick="switchTab('nearby')">近くの仕事</button>
+                    <button class="tab-button" onclick="switchTab('scheduled')">予定済み</button>
+                    <button class="tab-button" onclick="switchTab('history')">履歴</button>
+                </div>
+
+                <!-- Recommended Jobs -->
+                <div id="recommendedJobs" class="tab-content active">
+                    <div class="job-card" onclick="showJobDetails('rec1')">
+                        <div class="job-content">
+                            <div class="job-match">
+                                <div class="match-score">マッチ度: 92%</div>
+                            </div>
+                            <div class="job-header">
+                                <h3 class="facility-name">川崎物流センター</h3>
+                                <div class="job-wage-container">
+                                    <div class="job-wage">¥1,450/時</div>
+                                </div>
+                            </div>
+                            <div class="job-details">
+                                <p>📍 神奈川県川崎市川崎区東扇島20-3</p>
+                                <p>📅 明日 13:00-22:00</p>
+                            </div>
+                            <div class="job-tags">
+                                <span class="job-tag">フォークリフト</span>
+                                <span class="job-tag">即日払い</span>
+                            </div>
+                            <div class="job-actions">
+                                <button class="save-button" onclick="saveJob('rec1')">❤️</button>
+                                <button class="apply-button" onclick="quickApply('rec1')">応募する</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Scanner -->
+                <div style="background: #fff8dc; border-radius: 15px; padding: 30px; text-align: center; margin-top: 20px; border: 1px solid #f0e68c;">
+                    <div style="font-size: 80px; margin-bottom: 20px;">📷</div>
+                    <h2 style="margin-bottom: 10px; color: #1a1a1a;">勤務開始・終了</h2>
+                    <p style="color: #2d0000; margin-bottom: 20px;">QRコードをスキャンして記録</p>
+                    <button class="apply-button" onclick="simulateScan()">QRスキャン</button>
+                </div>
+            </div>
+
+            <!-- My Page -->
+            <div id="mypage" class="page">
+                <!-- Performance Dashboard -->
+                <div class="performance-card">
+                    <h3 style="margin-bottom: 15px;">📊 今月のパフォーマンス</h3>
+                    <div class="performance-chart">
+                        <div class="chart-bars">
+                            <div class="chart-bar" style="height: 60%"><span class="chart-label">第1週</span></div>
+                            <div class="chart-bar" style="height: 80%"><span class="chart-label">第2週</span></div>
+                            <div class="chart-bar" style="height: 90%"><span class="chart-label">第3週</span></div>
+                            <div class="chart-bar" style="height: 70%"><span class="chart-label">第4週</span></div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; color: #8b0000;">42日</div>
+                            <div style="font-size: 12px; color: #666;">勤務日数</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; color: #228b22;">98%</div>
+                            <div style="font-size: 12px; color: #666;">出勤率</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; color: #FFD700;">4.8★</div>
+                            <div style="font-size: 12px; color: #666;">評価</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Progress -->
+                <div class="skills-section" style="background: #fff8dc; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #f0e68c;">
+                    <h3 class="skills-header" style="margin-bottom: 20px;">スキル進捗</h3>
+                    
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>基本物流作業</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>フォークリフト操作</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>在庫管理システム</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" style="width: 60%"></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-item">
+                        <div class="skill-name">
+                            <span>チームリーダーシップ</span>
+                            <span>40%</span>
+                        </div>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" style="width: 40%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div style="background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #f0e68c;">
+                    <h3 style="margin-bottom: 15px;">🏆 実績とバッジ</h3>
+                    <div class="badge-container">
+                        <div class="achievement-badge">🎯 皆勤賞</div>
+                        <div class="achievement-badge">⚡ スピードマスター</div>
+                        <div class="achievement-badge">🤝 チームプレイヤー</div>
+                        <div class="achievement-badge locked">🏅 ゴールドワーカー</div>
+                    </div>
+                    <p style="font-size: 14px; color: #666; margin-top: 15px;">次のレベルまであと15時間の実務経験</p>
+                </div>
+
+                <!-- Settings Menu -->
+                <div style="background: #fff; border-radius: 15px; padding: 10px 0; border: 1px solid #f0e68c;">
+                    <div class="menu-item" onclick="showProfile()">
+                        <span>👤 プロフィール編集</span>
+                        <span>→</span>
+                    </div>
+                    <div class="menu-item" onclick="showNotificationSettings()">
+                        <span>🔔 通知設定</span>
+                        <span>→</span>
+                    </div>
+                    <div class="menu-item" onclick="showPrivacy()">
+                        <span>🔒 プライバシー設定</span>
+                        <span>→</span>
+                    </div>
+                    <div class="menu-item" onclick="showHelp()">
+                        <span>❓ ヘルプ</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Page -->
+            <div id="wallet" class="page">
+                <div class="wallet-balance">
+                    <div class="balance-title">利用可能残高</div>
+                    <div class="balance-amount">¥125,600</div>
+                    <div class="wallet-actions">
+                        <div class="wallet-button" onclick="showWithdrawModal()">
+                            <div>💸</div>
+                            <div>出金申請</div>
+                        </div>
+                        <div class="wallet-button" onclick="showInvestmentModal()">
+                            <div>📈</div>
+                            <div>資産運用</div>
+                        </div>
+                        <div class="wallet-button" onclick="showPaymentHistory()">
+                            <div>📋</div>
+                            <div>取引履歴</div>
+                        </div>
+                        <div class="wallet-button" onclick="showPaymentSettings()">
+                            <div>⚙️</div>
+                            <div>支払設定</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Services -->
+                <div class="financial-services">
+                    <h3 style="margin-bottom: 10px;">💳 金融サービス</h3>
+                    <div class="service-grid">
+                        <div class="service-item" onclick="showSkillFund()">
+                            <div class="service-icon">🎓</div>
+                            <div class="service-name">技能研修基金</div>
+                            <div class="service-desc">月1万円積立</div>
+                        </div>
+                        <div class="service-item" onclick="showInsurance()">
+                            <div class="service-icon">🛡️</div>
+                            <div class="service-name">労災保険</div>
+                            <div class="service-desc">自動加入済み</div>
+                        </div>
+                        <div class="service-item" onclick="showAdvancePay()">
+                            <div class="service-icon">💰</div>
+                            <div class="service-name">給与前払い</div>
+                            <div class="service-desc">最大70%</div>
+                        </div>
+                        <div class="service-item" onclick="showLoan()">
+                            <div class="service-icon">🏦</div>
+                            <div class="service-name">少額ローン</div>
+                            <div class="service-desc">最大10万円</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Investment Status -->
+                <div style="background: #fff8dc; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #f0e68c;">
+                    <h3 style="margin-bottom: 15px;">📊 資産運用状況</h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #2d0000;">7日間運用（1%）</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">¥50,000</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #2d0000;">14日間運用（2%）</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">¥30,000</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; padding-top: 10px; border-top: 1px solid #f0e68c;">
+                        <span style="color: #1a1a1a;">運用総額</span>
+                        <span style="color: #228b22;">¥80,000</span>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="apply-button" onclick="showInvestmentModal()">運用プランを見る</button>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <h3 style="margin-bottom: 15px;">最近の取引</h3>
+                <div class="history-item" style="background: #fff8dc; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0e68c;">
+                    <div class="history-details">
+                        <h3 style="font-size: 16px; margin-bottom: 5px; color: #1a1a1a;">東京ロジスティクスセンター</h3>
+                        <p class="history-date" style="font-size: 14px; color: #2d0000;">2024/07/20 - 8時間勤務</p>
+                    </div>
+                    <div class="history-amount" style="font-size: 18px; font-weight: 600; color: #228b22;">+¥12,000</div>
+                </div>
+                
+                <div class="history-item" style="background: #fff8dc; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0e68c;">
+                    <div class="history-details">
+                        <h3 style="font-size: 16px; margin-bottom: 5px; color: #1a1a1a;">運用収益</h3>
+                        <p class="history-date" style="font-size: 14px; color: #2d0000;">2024/07/18 - 7日間運用完了</p>
+                    </div>
+                    <div class="history-amount" style="font-size: 18px; font-weight: 600; color: #228b22;">+¥500</div>
+                </div>
+            </div>
+
+            <!-- Navigation Bar - 4 tabs -->
+            <nav class="nav-bar">
+                <a href="#" class="nav-item active" onclick="showPage('home')">
+                    <span class="nav-icon">🏠</span>
+                    <span>ホーム</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('work')">
+                    <span class="nav-icon">💼</span>
+                    <span>仕事</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('mypage')">
+                    <span class="nav-icon">👤</span>
+                    <span>マイページ</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('wallet')">
+                    <span class="nav-icon">💰</span>
+                    <span>ウォレット</span>
+                </a>
+            </nav>
+
+            <!-- Job Details Modal -->
+            <div id="jobModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeModal('jobModal')">×</span>
+                    <h2 class="modal-header">求人詳細</h2>
+                    <div id="jobModalContent"></div>
+                </div>
+            </div>
+
+            <!-- Withdraw Modal -->
+            <div id="withdrawModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeModal('withdrawModal')">×</span>
+                    <h2 class="modal-header">出金申請</h2>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">出金額</label>
+                        <input type="number" class="form-input" id="withdrawAmount" placeholder="¥0" max="125600" style="width: 100%; padding: 12px; border: 1px solid #f0e68c; border-radius: 8px; font-size: 16px;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">出金先銀行</label>
+                        <select class="form-input" style="width: 100%; padding: 12px; border: 1px solid #f0e68c; border-radius: 8px; font-size: 16px;">
+                            <option>みずほ銀行 普通 ****1234</option>
+                            <option>三菱UFJ銀行 普通 ****5678</option>
+                        </select>
+                    </div>
+
+                    <div style="background: #e8f5e9; border: 1px solid #4caf50; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: #2e7d32; font-size: 14px; margin: 0;">
+                            ✓ 24時間365日いつでも出金可能<br>
+                            ✓ 手数料無料<br>
+                            ✓ 最短20秒で着金
+                        </p>
+                    </div>
+
+                    <button class="apply-button" onclick="processWithdraw()">出金する</button>
+                </div>
+            </div>
+
+            <!-- Investment Modal -->
+            <div id="investmentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeModal('investmentModal')">×</span>
+                    <h2 class="modal-header">資産運用</h2>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">運用金額</label>
+                        <input type="number" class="form-input" id="investAmount" placeholder="¥0" max="125600" style="width: 100%; padding: 12px; border: 1px solid #f0e68c; border-radius: 8px; font-size: 16px;">
+                    </div>
+
+                    <div class="investment-options">
+                        <div class="investment-card" onclick="selectInvestment(this, 7, 1)" style="background: #fff8dc; border: 2px solid transparent; border-radius: 12px; padding: 20px; margin-bottom: 15px; cursor: pointer;">
+                            <div class="investment-period" style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">7日間</div>
+                            <div class="investment-rate" style="font-size: 24px; font-weight: 700; color: #228b22; margin-bottom: 10px;">1.0%</div>
+                            <div class="investment-details" style="font-size: 14px; color: #2d0000;">
+                                短期運用でも確実な収益<br>
+                                予想収益: <span class="expected-return">¥0</span>
+                            </div>
+                        </div>
+
+                        <div class="investment-card" onclick="selectInvestment(this, 14, 2)" style="background: #fff8dc; border: 2px solid transparent; border-radius: 12px; padding: 20px; margin-bottom: 15px; cursor: pointer;">
+                            <div class="investment-period" style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">14日間</div>
+                            <div class="investment-rate" style="font-size: 24px; font-weight: 700; color: #228b22; margin-bottom: 10px;">2.0%</div>
+                            <div class="investment-details" style="font-size: 14px; color: #2d0000;">
+                                バランスの良い運用期間<br>
+                                予想収益: <span class="expected-return">¥0</span>
+                            </div>
+                        </div>
+
+                        <div class="investment-card" onclick="selectInvestment(this, 30, 4)" style="background: #fff8dc; border: 2px solid transparent; border-radius: 12px; padding: 20px; margin-bottom: 15px; cursor: pointer;">
+                            <div class="investment-period" style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">30日間</div>
+                            <div class="investment-rate" style="font-size: 24px; font-weight: 700; color: #228b22; margin-bottom: 10px;">4.0%</div>
+                            <div class="investment-details" style="font-size: 14px; color: #2d0000;">
+                                最大収益率での運用<br>
+                                予想収益: <span class="expected-return">¥0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="apply-button" onclick="processInvestment()">運用開始</button>
+                </div>
+            </div>
+
+            <!-- Notification -->
+            <div id="notification" class="notification"></div>
+        </div>
+    </div>
+
+    <style>
+        .menu-item {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0e68c;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .menu-item:hover {
+            background: #fffef5;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-button.active {
+            color: #8b0000;
+            border-bottom-color: #8b0000;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .investment-card.selected {
+            border-color: #8b0000 !important;
+            background: #fffef5 !important;
+        }
+    </style>
+
+    <script>
+        // Pull to Refresh
+        let startY = 0;
+        let isPulling = false;
+        const phoneScreen = document.getElementById('phoneScreen');
+        const pullToRefresh = document.getElementById('pullToRefresh');
+
+        phoneScreen.addEventListener('touchstart', (e) => {
+            if (phoneScreen.scrollTop === 0) {
+                startY = e.touches[0].pageY;
+                isPulling = true;
+            }
+        });
+
+        phoneScreen.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+            
+            const currentY = e.touches[0].pageY;
+            const diff = currentY - startY;
+            
+            if (diff > 0 && diff < 100) {
+                pullToRefresh.style.top = (diff - 50) + 'px';
+            }
+        });
+
+        phoneScreen.addEventListener('touchend', () => {
+            if (isPulling && parseInt(pullToRefresh.style.top) > 0) {
+                pullToRefresh.classList.add('active');
+                setTimeout(() => {
+                    refreshContent();
+                    pullToRefresh.classList.remove('active');
+                    pullToRefresh.style.top = '-50px';
+                }, 1500);
+            } else {
+                pullToRefresh.style.top = '-50px';
+            }
+            isPulling = false;
+        });
+
+        // Refresh Content
+        function refreshContent() {
+            showNotification('コンテンツを更新しました');
+            // Update countdown timers
+            updateCountdowns();
+        }
+
+        // Update Countdowns
+        function updateCountdowns() {
+            const countdowns = document.querySelectorAll('.countdown');
+            countdowns.forEach(countdown => {
+                const time = countdown.textContent;
+                const [minutes, seconds] = time.split(':').map(Number);
+                let totalSeconds = minutes * 60 + seconds;
+                
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    const newMinutes = Math.floor(totalSeconds / 60);
+                    const newSeconds = totalSeconds % 60;
+                    countdown.textContent = `${String(newMinutes).padStart(2, '0')}:${String(newSeconds).padStart(2, '0')}`;
+                }
+            });
+        }
+
+        // Start countdown timer
+        setInterval(updateCountdowns, 1000);
+
+        // Page Navigation with Animation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            setTimeout(() => {
+                document.getElementById(pageId).classList.add('active');
+            }, 100);
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Scroll to top
+            phoneScreen.scrollTop = 0;
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show corresponding content
+            showNotification(`${tabName}タブに切り替えました`);
+        }
+
+        // Quick Apply with Animation
+        function quickApply(jobId) {
+            event.stopPropagation();
+            
+            // Animate button
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            button.textContent = '応募中...';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                button.textContent = '応募完了！';
+                button.style.background = '#228b22';
+                showNotification('応募が完了しました！担当者から連絡があります。');
+                
+                // Confetti animation
+                createConfetti();
+            }, 1000);
+        }
+
+        // Create Confetti Effect
+        function createConfetti() {
+            const colors = ['#8b0000', '#FFD700', '#228b22', '#FF6347'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * window.innerWidth + 'px';
+                confetti.style.top = '-10px';
+                confetti.style.borderRadius = '50%';
+                confetti.style.zIndex = '1000';
+                document.body.appendChild(confetti);
+                
+                // Animate confetti
+                let pos = -10;
+                const fall = setInterval(() => {
+                    pos += 5;
+                    confetti.style.top = pos + 'px';
+                    confetti.style.transform = `rotate(${pos * 5}deg)`;
+                    
+                    if (pos > window.innerHeight) {
+                        clearInterval(fall);
+                        confetti.remove();
+                    }
+                }, 20);
+            }
+        }
+
+        // Save Job
+        function saveJob(jobId) {
+            event.stopPropagation();
+            const button = event.target;
+            button.textContent = '💖';
+            showNotification('お気に入りに保存しました');
+        }
+
+        // Show Job Details
+        function showJobDetails(jobId) {
+            const jobData = {
+                urgent1: {
+                    name: '千葉物流パーク',
+                    wage: '¥1,800/時',
+                    wageBadge: '夜勤手当25%込み',
+                    location: '千葉県市川市塩浜2-20',
+                    time: '今夜 20:00-05:00',
+                    urgency: '緊急度: 非常に高い（残り2名）',
+                    description: '夜間の物流センター管理、チームリーダー業務。フォークリフト操作を含む。',
+                    requirements: ['フォークリフト免許必須', '夜勤可能な方', 'リーダー経験者優遇'],
+                    benefits: ['夜勤手当25%', '即日払い対応', '交通費全額支給', '深夜食事提供'],
+                    facilityInfo: '最新設備を備えた大型物流施設。休憩室完備、シャワー室あり。',
+                    matchScore: 92
+                },
+                rec1: {
+                    name: '川崎物流センター',
+                    wage: '¥1,450/時',
+                    location: '神奈川県川崎市川崎区東扇島20-3',
+                    time: '明日 13:00-22:00',
+                    description: 'ピッキング、仕分け、梱包作業。未経験者大歓迎、丁寧な研修あり。',
+                    requirements: ['18歳以上', '体力に自信のある方', '週2日以上勤務可能な方'],
+                    benefits: ['交通費全額支給', '日払い対応', '休憩室完備', '制服貸与'],
+                    matchScore: 92
+                }
+            };
+
+            const job = jobData[jobId] || jobData.urgent1;
+            const content = `
+                <div style="margin-bottom: 20px;">
+                    ${job.urgency ? `<div style="background: #fee; border: 1px solid #f88; border-radius: 10px; padding: 10px; margin-bottom: 15px; color: #c00; font-weight: 600;">${job.urgency}</div>` : ''}
+                    
+                    ${job.matchScore ? `
+                    <div style="background: #e8f5e9; border: 1px solid #4caf50; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                        <div style="color: #2e7d32; font-weight: 600; font-size: 18px; margin-bottom: 8px;">マッチ度: ${job.matchScore}%</div>
+                        <div style="color: #388e3c; font-size: 14px;">
+                            ✓ あなたのスキルと完全一致<br>
+                            ✓ 希望勤務時間帯と合致<br>
+                            ✓ 自宅からのアクセス良好
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <h3 style="color: #1a1a1a; margin-bottom: 10px;">${job.name}</h3>
+                    <p style="font-size: 28px; color: #8b0000; font-weight: 700; margin: 10px 0;">${job.wage}</p>
+                    ${job.wageBadge ? `<span style="background: #FFD700; color: #1a1a1a; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: 600;">${job.wageBadge}</span>` : ''}
+                    <p style="color: #2d0000; margin-top: 15px;">📍 ${job.location}</p>
+                    <p style="color: #2d0000;">📅 ${job.time}</p>
+                </div>
+
+                ${job.facilityInfo ? `
+                <div style="background: #fff8dc; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px; color: #1a1a1a;">施設情報</h4>
+                    <p style="color: #2d0000; font-size: 14px;">${job.facilityInfo}</p>
+                </div>
+                ` : ''}
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px; color: #1a1a1a;">仕事内容</h4>
+                    <p style="color: #2d0000;">${job.description}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px; color: #1a1a1a;">応募条件</h4>
+                    <ul style="color: #2d0000; padding-left: 20px;">
+                        ${job.requirements.map(req => `<li style="margin-bottom: 5px;">${req}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px; color: #1a1a1a;">待遇・福利厚生</h4>
+                    <ul style="color: #2d0000; padding-left: 20px;">
+                        ${job.benefits.map(benefit => `<li style="margin-bottom: 5px;">${benefit}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div style="background: #e8f5e9; border: 1px solid #4caf50; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                    <h4 style="color: #2e7d32; margin-bottom: 10px;">🏆 この仕事のメリット</h4>
+                    <p style="color: #388e3c; font-size: 14px;">
+                        • 即日勤務開始可能<br>
+                        • 勤務後すぐに給与受取<br>
+                        • スキルアップのチャンス<br>
+                        • 正社員登用の可能性あり
+                    </p>
+                </div>
+
+                <button class="apply-button" onclick="applyForJob('${jobId}')" style="width: 100%; padding: 15px; background: #8b0000; color: #fffef5; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer;">応募する</button>
+            `;
+
+            document.getElementById('jobModalContent').innerHTML = content;
+            document.getElementById('jobModal').classList.add('active');
+        }
+
+        function applyForJob(jobId) {
+            closeModal('jobModal');
+            showNotification('応募が完了しました！担当者から連絡があります。');
+            createConfetti();
+        }
+
+        // Role Switcher
+        function showRoleSwitcher() {
+            showNotification('役割切替機能は準備中です');
+        }
+
+        // Modal Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('active');
+        }
+
+        function showInvestmentModal() {
+            document.getElementById('investmentModal').classList.add('active');
+        }
+
+        // Investment Selection
+        let selectedInvestment = null;
+
+        function selectInvestment(card, days, rate) {
+            document.querySelectorAll('.investment-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            card.classList.add('selected');
+            selectedInvestment = { days, rate };
+            
+            // Update expected returns
+            const amount = parseInt(document.getElementById('investAmount').value) || 0;
+            updateExpectedReturns(amount);
+        }
+
+        function updateExpectedReturns(amount) {
+            const cards = document.querySelectorAll('.investment-card');
+            const rates = [1, 2, 4];
+            
+            cards.forEach((card, index) => {
+                const expectedReturn = Math.floor(amount * rates[index] / 100);
+                card.querySelector('.expected-return').textContent = `¥${expectedReturn.toLocaleString()}`;
+            });
+        }
+
+        document.getElementById('investAmount').addEventListener('input', function(e) {
+            updateExpectedReturns(parseInt(e.target.value) || 0);
+        });
+
+        // Process Functions
+        function processWithdraw() {
+            const amount = document.getElementById('withdrawAmount').value;
+            if (!amount || amount <= 0) {
+                showNotification('出金額を入力してください');
+                return;
+            }
+            
+            closeModal('withdrawModal');
+            showNotification(`¥${parseInt(amount).toLocaleString()}の出金申請が完了しました`);
+        }
+
+        function processInvestment() {
+            const amount = document.getElementById('investAmount').value;
+            if (!amount || amount <= 0) {
+                showNotification('運用金額を入力してください');
+                return;
+            }
+            
+            if (!selectedInvestment) {
+                showNotification('運用期間を選択してください');
+                return;
+            }
+            
+            closeModal('investmentModal');
+            showNotification(`¥${parseInt(amount).toLocaleString()}を${selectedInvestment.days}日間で運用開始しました`);
+        }
+
+        // QR Scanner Simulation
+        function simulateScan() {
+            const button = event.target;
+            button.textContent = 'スキャン中...';
+            button.style.background = '#666';
+            
+            setTimeout(() => {
+                button.textContent = 'チェックイン完了！';
+                button.style.background = '#228b22';
+                showNotification('勤務開始を記録しました。頑張ってください！');
+                
+                setTimeout(() => {
+                    button.textContent = 'QRスキャン';
+                    button.style.background = '#8b0000';
+                }, 3000);
+            }, 2000);
+        }
+
+        // Other Modal Functions
+        function showFilters() {
+            showNotification('詳細フィルター機能を開発中です');
+        }
+
+        function showPaymentHistory() {
+            showNotification('取引履歴の詳細を表示します');
+        }
+
+        function showPaymentSettings() {
+            showNotification('支払い設定を開きます');
+        }
+
+        function showSkillFund() {
+            showNotification('技能研修基金の詳細を表示します');
+        }
+
+        function showInsurance() {
+            showNotification('労災保険の詳細を表示します');
+        }
+
+        function showAdvancePay() {
+            showNotification('給与前払いサービスを開きます');
+        }
+
+        function showLoan() {
+            showNotification('少額ローンサービスを開きます');
+        }
+
+        function showProfile() {
+            showNotification('プロフィール編集画面を開きます');
+        }
+
+        function showNotificationSettings() {
+            showNotification('通知設定を開きます');
+        }
+
+        function showPrivacy() {
+            showNotification('プライバシー設定を開きます');
+        }
+
+        function showHelp() {
+            showNotification('ヘルプセンターを開きます');
+        }
+
+        // Notification System
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate skill progress bars on load
+            setTimeout(() => {
+                document.querySelectorAll('.skill-progress-bar').forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+
+            // Simulate real-time updates
+            setInterval(() => {
+                // Update random job slots
+                const jobCards = document.querySelectorAll('.job-card');
+                jobCards.forEach(card => {
+                    const slots = card.querySelector('.job-details p:nth-child(3)');
+                    if (slots && Math.random() > 0.7) {
+                        const match = slots.textContent.match(/\d+/);
+                        if (match) {
+                            const current = parseInt(match[0]);
+                            if (current > 0) {
+                                slots.textContent = `👥 募集人数: 残り${current - 1}名`;
+                            }
+                        }
+                    }
+                });
+            }, 30000);
+
+            // Add swipe gestures (simplified)
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) {
+                    // Swipe left
+                    console.log('Swipe left detected');
+                }
+                if (touchEndX > touchStartX + 50) {
+                    // Swipe right
+                    console.log('Swipe right detected');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
