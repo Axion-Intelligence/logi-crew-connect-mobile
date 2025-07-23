@@ -1055,44 +1055,157 @@
 
             <!-- Work Page -->
             <div id="work" class="page">
-                <!-- Search and Filter -->
-                <div class="section-header">
-                    <h3 class="section-title">仕事を探す</h3>
-                    <a href="#" class="section-action" onclick="showFilters()">絞り込み</a>
+                <!-- Search Bar -->
+                <div style="background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="searchInput" placeholder="地域、施設名、スキルで検索..." 
+                               style="flex: 1; padding: 12px; border: 1px solid #f0e68c; border-radius: 10px; font-size: 16px;"
+                               onkeyup="performLiveSearch()">
+                        <button onclick="toggleFilterPanel()" style="padding: 12px 20px; background: #8b0000; color: white; border: none; border-radius: 10px; font-weight: 600;">
+                            絞り込み
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Filters -->
+                    <div style="display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px;">
+                        <span class="quick-filter active" onclick="applyQuickFilter(this, 'all')">すべて</span>
+                        <span class="quick-filter" onclick="applyQuickFilter(this, 'urgent')">🔥 緊急</span>
+                        <span class="quick-filter" onclick="applyQuickFilter(this, 'night')">🌙 夜勤</span>
+                        <span class="quick-filter" onclick="applyQuickFilter(this, 'high-wage')">💰 高時給</span>
+                        <span class="quick-filter" onclick="applyQuickFilter(this, 'beginner')">🌱 未経験OK</span>
+                        <span class="quick-filter" onclick="applyQuickFilter(this, 'forklift')">🚜 フォーク</span>
+                    </div>
+                </div>
+
+                <!-- Advanced Filter Panel (Hidden by default) -->
+                <div id="filterPanel" style="display: none; background: #fff8dc; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #f0e68c;">
+                    <h4 style="margin-bottom: 15px; color: #1a1a1a;">詳細検索条件</h4>
+                    
+                    <!-- Location Filter -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">勤務地</label>
+                        <select id="locationFilter" style="width: 100%; padding: 10px; border: 1px solid #f0e68c; border-radius: 8px;">
+                            <option value="">すべての地域</option>
+                            <option value="tokyo">東京都</option>
+                            <option value="kanagawa">神奈川県</option>
+                            <option value="chiba">千葉県</option>
+                            <option value="saitama">埼玉県</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Wage Range -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">時給範囲</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="minWage" placeholder="最低" style="flex: 1; padding: 10px; border: 1px solid #f0e68c; border-radius: 8px;">
+                            <span>〜</span>
+                            <input type="number" id="maxWage" placeholder="最高" style="flex: 1; padding: 10px; border: 1px solid #f0e68c; border-radius: 8px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Work Time -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">勤務時間帯</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="morning"> 早朝 (5:00-9:00)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="daytime"> 日中 (9:00-17:00)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="evening"> 夕方 (17:00-22:00)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="night"> 深夜 (22:00-5:00)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Requirements -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 14px; color: #2d0000; margin-bottom: 8px; display: block;">必要資格・条件</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="noExperience"> 未経験歓迎
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="forkliftLicense"> フォークリフト
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="leadExperience"> リーダー経験
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="heavyLifting"> 重量物取扱
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="applyFilters()" style="flex: 1; padding: 12px; background: #8b0000; color: white; border: none; border-radius: 10px; font-weight: 600;">
+                            検索する
+                        </button>
+                        <button onclick="resetFilters()" style="padding: 12px 20px; background: #fff; color: #8b0000; border: 2px solid #8b0000; border-radius: 10px; font-weight: 600;">
+                            リセット
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search Results Info -->
+                <div id="searchInfo" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span style="color: #666; font-size: 14px;">検索結果: <span id="resultCount">24</span>件</span>
+                    <select id="sortOrder" onchange="sortResults()" style="padding: 8px; border: 1px solid #f0e68c; border-radius: 8px; font-size: 14px;">
+                        <option value="match">マッチ度順</option>
+                        <option value="wage-high">時給が高い順</option>
+                        <option value="wage-low">時給が低い順</option>
+                        <option value="distance">距離が近い順</option>
+                        <option value="newest">新着順</option>
+                    </select>
                 </div>
 
                 <!-- Tab Navigation -->
                 <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #f0e68c; padding-bottom: 10px;">
-                    <button class="tab-button active" onclick="switchTab('recommended')">おすすめ</button>
-                    <button class="tab-button" onclick="switchTab('nearby')">近くの仕事</button>
-                    <button class="tab-button" onclick="switchTab('scheduled')">予定済み</button>
-                    <button class="tab-button" onclick="switchTab('history')">履歴</button>
+                    <button class="tab-button active" onclick="switchTab('search')">検索結果</button>
+                    <button class="tab-button" onclick="switchTab('saved')">保存済み</button>
+                    <button class="tab-button" onclick="switchTab('applied')">応募済み</button>
+                    <button class="tab-button" onclick="switchTab('history')">勤務履歴</button>
                 </div>
 
-                <!-- Recommended Jobs -->
-                <div id="recommendedJobs" class="tab-content active">
-                    <div class="job-card" onclick="showJobDetails('rec1')">
+                <!-- Search Results -->
+                <div id="searchResults" class="tab-content active">
+                    <!-- Results will be dynamically inserted here -->
+                    <div id="jobListContainer">
+                        <!-- Loading skeleton -->
+                        <div class="skeleton" style="height: 180px; margin-bottom: 15px;"></div>
+                        <div class="skeleton" style="height: 180px; margin-bottom: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Saved Jobs -->
+                <div id="savedJobs" class="tab-content" style="display: none;">
+                    <div class="empty-state">
+                        <div class="empty-icon">❤️</div>
+                        <div class="empty-title">保存した求人はありません</div>
+                        <div class="empty-description">気になる求人を見つけたら、ハートボタンをタップして保存しましょう</div>
+                    </div>
+                </div>
+
+                <!-- Applied Jobs -->
+                <div id="appliedJobs" class="tab-content" style="display: none;">
+                    <div class="job-card">
                         <div class="job-content">
-                            <div class="job-match">
-                                <div class="match-score">マッチ度: 92%</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="background: #4caf50; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px;">承認済み</span>
+                                <span style="color: #666; font-size: 12px;">2時間前に応募</span>
                             </div>
                             <div class="job-header">
-                                <h3 class="facility-name">川崎物流センター</h3>
+                                <h3 class="facility-name">東京ロジスティクスセンター</h3>
                                 <div class="job-wage-container">
-                                    <div class="job-wage">¥1,450/時</div>
+                                    <div class="job-wage">¥1,500/時</div>
                                 </div>
                             </div>
                             <div class="job-details">
-                                <p>📍 神奈川県川崎市川崎区東扇島20-3</p>
-                                <p>📅 明日 13:00-22:00</p>
-                            </div>
-                            <div class="job-tags">
-                                <span class="job-tag">フォークリフト</span>
-                                <span class="job-tag">即日払い</span>
-                            </div>
-                            <div class="job-actions">
-                                <button class="save-button" onclick="saveJob('rec1')">❤️</button>
-                                <button class="apply-button" onclick="quickApply('rec1')">応募する</button>
+                                <p>📅 明日 09:00-18:00</p>
                             </div>
                         </div>
                     </div>
@@ -1409,8 +1522,265 @@
                 </div>
             </div>
 
-            <!-- Notification -->
-            <div id="notification" class="notification"></div>
+            <!-- Transaction History Modal -->
+            <div id="transactionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeModal('transactionModal')">×</span>
+                    <h2 class="modal-header">取引履歴</h2>
+                    
+                    <!-- Filter Tabs -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #f0e68c; padding-bottom: 10px;">
+                        <button class="filter-tab active" onclick="filterTransactions('all')">すべて</button>
+                        <button class="filter-tab" onclick="filterTransactions('income')">収入</button>
+                        <button class="filter-tab" onclick="filterTransactions('withdraw')">出金</button>
+                        <button class="filter-tab" onclick="filterTransactions('investment')">運用</button>
+                    </div>
+                    
+                    <!-- Date Range -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+                        <select id="dateRange" onchange="updateDateRange()" style="flex: 1; padding: 10px; border: 1px solid #f0e68c; border-radius: 8px;">
+                            <option value="thisMonth">今月</option>
+                            <option value="lastMonth">先月</option>
+                            <option value="last3Months">過去3ヶ月</option>
+                            <option value="thisYear">今年</option>
+                            <option value="custom">期間指定</option>
+                        </select>
+                        <button onclick="downloadStatement()" style="padding: 10px 15px; background: #8b0000; color: white; border: none; border-radius: 8px; font-weight: 600;">
+                            📥 明細書
+                        </button>
+                    </div>
+                    
+                    <!-- Summary Stats -->
+                    <div style="background: #f0f8ff; border-radius: 10px; padding: 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <div style="font-size: 12px; color: #666;">期間収入合計</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #228b22;">+¥486,500</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #666;">期間支出合計</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #8b0000;">-¥360,900</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transaction List -->
+                    <div id="transactionList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- July 23 -->
+                        <div style="font-size: 14px; color: #666; margin: 15px 0 10px;">2024年7月23日（火）</div>
+                        
+                        <div class="transaction-item" style="background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e8f5e9; display: flex; align-items: center; justify-content: center;">
+                                    💰
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">勤務報酬</div>
+                                    <div style="font-size: 12px; color: #666;">東京ロジスティクスセンター・8時間</div>
+                                    <div style="font-size: 11px; color: #999;">15:30</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 600; color: #228b22;">+¥12,000</div>
+                                <div style="font-size: 11px; color: #666;">残高: ¥137,600</div>
+                            </div>
+                        </div>
+                        
+                        <div class="transaction-item" style="background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #fee; display: flex; align-items: center; justify-content: center;">
+                                    💸
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">出金</div>
+                                    <div style="font-size: 12px; color: #666;">みずほ銀行 ****1234</div>
+                                    <div style="font-size: 11px; color: #999;">10:15</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 600; color: #8b0000;">-¥50,000</div>
+                                <div style="font-size: 11px; color: #666;">残高: ¥125,600</div>
+                            </div>
+                        </div>
+                        
+                        <!-- July 22 -->
+                        <div style="font-size: 14px; color: #666; margin: 15px 0 10px;">2024年7月22日（月）</div>
+                        
+                        <div class="transaction-item" style="background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #fff3cd; display: flex; align-items: center; justify-content: center;">
+                                    📈
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">運用収益</div>
+                                    <div style="font-size: 12px; color: #666;">7日間運用・1%利回り</div>
+                                    <div style="font-size: 11px; color: #999;">09:00</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 600; color: #228b22;">+¥500</div>
+                                <div style="font-size: 11px; color: #666;">残高: ¥175,600</div>
+                            </div>
+                        </div>
+                        
+                        <div class="transaction-item" style="background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #e8f5e9; display: flex; align-items: center; justify-content: center;">
+                                    🌙
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">深夜手当込み報酬</div>
+                                    <div style="font-size: 12px; color: #666;">千葉物流パーク・9時間</div>
+                                    <div style="font-size: 11px; color: #999;">05:30</div>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: 600; color: #228b22;">+¥16,200</div>
+                                <div style="font-size: 11px; color: #666;">残高: ¥175,100</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Settings Modal -->
+            <div id="paymentSettingsModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeModal('paymentSettingsModal')">×</span>
+                    <h2 class="modal-header">支払い設定</h2>
+                    
+                    <!-- Bank Accounts -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: #1a1a1a;">登録済み銀行口座</h3>
+                        
+                        <div class="bank-card" style="background: #fff8dc; border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 2px solid #8b0000;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                        <span style="font-weight: 600;">みずほ銀行</span>
+                                        <span style="background: #8b0000; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px;">メイン</span>
+                                    </div>
+                                    <div style="font-size: 14px; color: #666;">普通 ****1234</div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 5px;">田中 太郎</div>
+                                </div>
+                                <button onclick="editBank('mizuho')" style="padding: 8px 15px; background: white; color: #8b0000; border: 1px solid #8b0000; border-radius: 8px; font-size: 14px;">
+                                    編集
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bank-card" style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid #f0e68c;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: 8px;">三菱UFJ銀行</div>
+                                    <div style="font-size: 14px; color: #666;">普通 ****5678</div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 5px;">田中 太郎</div>
+                                </div>
+                                <button onclick="setAsMain('mufg')" style="padding: 8px 15px; background: #f0f8ff; color: #1a1a1a; border: none; border-radius: 8px; font-size: 14px;">
+                                    メインに設定
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button onclick="addNewBank()" style="width: 100%; padding: 12px; background: white; color: #8b0000; border: 2px dashed #8b0000; border-radius: 10px; font-weight: 600; margin-top: 10px;">
+                            + 新しい口座を追加
+                        </button>
+                    </div>
+                    
+                    <!-- Auto Withdrawal -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: #1a1a1a;">自動出金設定</h3>
+                        
+                        <div style="background: #f0f8ff; border-radius: 10px; padding: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <span style="font-weight: 600;">自動出金を有効にする</span>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                                    <input type="checkbox" id="autoWithdraw" onchange="toggleAutoWithdraw()" style="opacity: 0; width: 0; height: 0;">
+                                    <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px;"></span>
+                                </label>
+                            </div>
+                            
+                            <div id="autoWithdrawSettings" style="display: none;">
+                                <div style="margin-bottom: 10px;">
+                                    <label style="font-size: 14px; color: #666;">出金タイミング</label>
+                                    <select style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                        <option>毎週月曜日</option>
+                                        <option>毎月1日</option>
+                                        <option>毎月15日</option>
+                                        <option>残高が一定額を超えたとき</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 14px; color: #666;">最低残高</label>
+                                    <input type="number" placeholder="¥10,000" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Preferences -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: #1a1a1a;">支払い優先設定</h3>
+                        
+                        <div style="background: #fff8dc; border-radius: 10px; padding: 15px;">
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="radio" name="paymentSpeed" checked>
+                                    <div>
+                                        <div style="font-weight: 600;">即時払い（推奨）</div>
+                                        <div style="font-size: 12px; color: #666;">勤務終了後、即座に受け取り可能</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="radio" name="paymentSpeed">
+                                    <div>
+                                        <div style="font-weight: 600;">日払い</div>
+                                        <div style="font-size: 12px; color: #666;">翌営業日に一括受け取り</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="radio" name="paymentSpeed">
+                                    <div>
+                                        <div style="font-weight: 600;">週払い</div>
+                                        <div style="font-size: 12px; color: #666;">毎週月曜日に前週分を受け取り</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <div>
+                        <h3 style="font-size: 16px; margin-bottom: 15px; color: #1a1a1a;">通知設定</h3>
+                        
+                        <div style="background: #f0f8ff; border-radius: 10px; padding: 15px;">
+                            <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span>入金通知</span>
+                                <input type="checkbox" checked>
+                            </label>
+                            
+                            <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span>出金完了通知</span>
+                                <input type="checkbox" checked>
+                            </label>
+                            
+                            <label style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>運用収益通知</span>
+                                <input type="checkbox" checked>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button onclick="savePaymentSettings()" style="width: 100%; padding: 15px; background: #8b0000; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; margin-top: 20px;">
+                        設定を保存
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1459,9 +1829,76 @@
             display: block;
         }
         
-        .investment-card.selected {
-            border-color: #8b0000 !important;
-            background: #fffef5 !important;
+        .filter-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .filter-tab.active {
+            color: #8b0000;
+            border-bottom-color: #8b0000;
+        }
+        
+        .transaction-item {
+            transition: all 0.3s ease;
+        }
+        
+        .transaction-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 26px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #8b0000;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
         }
     </style>
 
@@ -1515,8 +1952,15 @@
         function updateCountdowns() {
             const countdowns = document.querySelectorAll('.countdown');
             countdowns.forEach(countdown => {
+                if (!countdown || !countdown.textContent) return;
+                
                 const time = countdown.textContent;
-                const [minutes, seconds] = time.split(':').map(Number);
+                const timeParts = time.split(':');
+                if (timeParts.length !== 2) return;
+                
+                const [minutes, seconds] = timeParts.map(Number);
+                if (isNaN(minutes) || isNaN(seconds)) return;
+                
                 let totalSeconds = minutes * 60 + seconds;
                 
                 if (totalSeconds > 0) {
@@ -1547,25 +1991,314 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.target.closest('.nav-item').classList.add('active');
+            
+            // Find and activate the correct nav item
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if ((pageId === 'home' && item.textContent.includes('ホーム')) ||
+                    (pageId === 'work' && item.textContent.includes('仕事')) ||
+                    (pageId === 'mypage' && item.textContent.includes('マイページ')) ||
+                    (pageId === 'wallet' && item.textContent.includes('ウォレット'))) {
+                    item.classList.add('active');
+                }
+            });
             
             // Scroll to top
-            phoneScreen.scrollTop = 0;
+            const phoneScreen = document.getElementById('phoneScreen');
+            if (phoneScreen) {
+                phoneScreen.scrollTop = 0;
+            }
+            
+            // Initialize page-specific features
+            if (pageId === 'work') {
+                performSearch();
+            }
         }
 
         // Tab Switching
         function switchTab(tabName) {
+            const clickedButton = event.target;
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            clickedButton.classList.add('active');
             
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
+                content.style.display = 'none';
             });
             
             // Show corresponding content
-            showNotification(`${tabName}タブに切り替えました`);
+            if (tabName === 'search') {
+                const searchResults = document.getElementById('searchResults');
+                if (searchResults) {
+                    searchResults.style.display = 'block';
+                    searchResults.classList.add('active');
+                }
+                performSearch();
+            } else if (tabName === 'saved') {
+                const savedJobs = document.getElementById('savedJobs');
+                if (savedJobs) {
+                    savedJobs.style.display = 'block';
+                }
+            } else if (tabName === 'applied') {
+                const appliedJobs = document.getElementById('appliedJobs');
+                if (appliedJobs) {
+                    appliedJobs.style.display = 'block';
+                }
+            }
+        }
+
+        // Toggle Filter Panel
+        function toggleFilterPanel() {
+            const panel = document.getElementById('filterPanel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                panel.style.animation = 'slideDown 0.3s ease';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        // Quick Filter
+        function applyQuickFilter(element, filterType) {
+            // Update UI
+            document.querySelectorAll('.quick-filter').forEach(filter => {
+                filter.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // Apply filter
+            performSearch(filterType);
+        }
+
+        // Live Search
+        function performLiveSearch() {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (searchTerm.length > 1 || searchTerm.length === 0) {
+                performSearch();
+            }
+        }
+
+        // Perform Search
+        function performSearch(filterType = 'all') {
+            const container = document.getElementById('jobListContainer');
+            if (!container) {
+                console.error('Job list container not found');
+                return;
+            }
+            
+            container.innerHTML = '<div class="skeleton" style="height: 180px; margin-bottom: 15px;"></div>';
+            
+            // Simulate API call
+            setTimeout(() => {
+                const jobs = generateJobResults(filterType);
+                displayJobResults(jobs);
+            }, 500);
+        }
+
+        // Generate Job Results
+        function generateJobResults(filterType) {
+            const allJobs = [
+                {
+                    id: 'search1',
+                    name: '東京ロジスティクスセンター A棟',
+                    wage: 1500,
+                    location: '東京都江東区新砂3-4-11',
+                    time: '明日 09:00-18:00',
+                    tags: ['フォークリフト必須', '即日払い', '交通費支給'],
+                    match: 95,
+                    urgent: true,
+                    slots: 3,
+                    isNight: false,
+                    requiresExperience: true
+                },
+                {
+                    id: 'search2',
+                    name: '横浜配送センター',
+                    wage: 1350,
+                    location: '神奈川県横浜市鶴見区大黒町9-5',
+                    time: '明後日 06:00-15:00',
+                    tags: ['未経験歓迎', '早朝手当', '制服貸与'],
+                    match: 88,
+                    urgent: false,
+                    slots: 8,
+                    isNight: false,
+                    requiresExperience: false
+                },
+                {
+                    id: 'search3',
+                    name: '千葉物流パーク',
+                    wage: 1800,
+                    location: '千葉県市川市塩浜2-20',
+                    time: '今夜 20:00-05:00',
+                    tags: ['夜勤手当', 'リーダー候補', '週払い可'],
+                    match: 92,
+                    urgent: true,
+                    slots: 2,
+                    isNight: true,
+                    requiresExperience: true
+                },
+                {
+                    id: 'search4',
+                    name: '埼玉中央配送センター',
+                    wage: 1650,
+                    location: '埼玉県川口市領家5-14-35',
+                    time: '今日 22:00-07:00',
+                    tags: ['夜勤', '高時給', '送迎あり'],
+                    match: 78,
+                    urgent: true,
+                    slots: 1,
+                    isNight: true,
+                    requiresExperience: false
+                }
+            ];
+
+            // Filter based on type
+            let filteredJobs = allJobs;
+            switch (filterType) {
+                case 'urgent':
+                    filteredJobs = allJobs.filter(job => job.urgent);
+                    break;
+                case 'night':
+                    filteredJobs = allJobs.filter(job => job.isNight);
+                    break;
+                case 'high-wage':
+                    filteredJobs = allJobs.filter(job => job.wage >= 1600);
+                    break;
+                case 'beginner':
+                    filteredJobs = allJobs.filter(job => !job.requiresExperience);
+                    break;
+                case 'forklift':
+                    filteredJobs = allJobs.filter(job => job.tags.includes('フォークリフト必須'));
+                    break;
+            }
+
+            // Apply additional filters if panel is open
+            if (document.getElementById('filterPanel').style.display !== 'none') {
+                filteredJobs = applyAdvancedFilters(filteredJobs);
+            }
+
+            // Apply search term
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (searchTerm) {
+                filteredJobs = filteredJobs.filter(job => 
+                    job.name.toLowerCase().includes(searchTerm) ||
+                    job.location.toLowerCase().includes(searchTerm) ||
+                    job.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Update count
+            document.getElementById('resultCount').textContent = filteredJobs.length;
+
+            return filteredJobs;
+        }
+
+        // Apply Advanced Filters
+        function applyAdvancedFilters(jobs) {
+            const minWageElement = document.getElementById('minWage');
+            const maxWageElement = document.getElementById('maxWage');
+            
+            const minWage = minWageElement ? parseInt(minWageElement.value) || 0 : 0;
+            const maxWage = maxWageElement ? parseInt(maxWageElement.value) || 9999 : 9999;
+            
+            return jobs.filter(job => {
+                if (job.wage < minWage || job.wage > maxWage) return false;
+                
+                // Add more filter logic here
+                return true;
+            });
+        }
+
+        // Display Job Results
+        function displayJobResults(jobs) {
+            const container = document.getElementById('jobListContainer');
+            
+            if (!container) {
+                console.error('Job list container not found');
+                return;
+            }
+            
+            if (jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <div class="empty-title">検索結果がありません</div>
+                        <div class="empty-description">条件を変更して再度お試しください</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = jobs.map(job => `
+                <div class="job-card" onclick="showJobDetails('${job.id}')">
+                    ${job.urgent ? `
+                    <div class="job-card-urgent">
+                        <span>残り${job.slots}枠</span>
+                        <span class="countdown">01:30</span>
+                    </div>
+                    ` : ''}
+                    <div class="job-content">
+                        ${job.match > 90 ? `
+                        <div class="job-match">
+                            <div class="match-score">マッチ度: ${job.match}%</div>
+                        </div>
+                        ` : ''}
+                        <div class="job-header">
+                            <h3 class="facility-name">${job.name}</h3>
+                            <div class="job-wage-container">
+                                <div class="job-wage">¥${job.wage}/時</div>
+                                ${job.wage >= 1600 ? '<div class="wage-badge">高時給</div>' : ''}
+                            </div>
+                        </div>
+                        <div class="job-details">
+                            <p>📍 ${job.location}</p>
+                            <p>📅 ${job.time}</p>
+                            <p>👥 募集人数: ${job.slots}名</p>
+                        </div>
+                        <div class="job-tags">
+                            ${job.tags.map(tag => `<span class="job-tag ${tag.includes('夜勤') ? 'hot' : ''}">${tag}</span>`).join('')}
+                        </div>
+                        <div class="job-actions">
+                            <button class="save-button" onclick="saveJob('${job.id}')">❤️</button>
+                            <button class="apply-button" onclick="quickApply('${job.id}')">応募する</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Update result count
+            const resultCount = document.getElementById('resultCount');
+            if (resultCount) {
+                resultCount.textContent = jobs.length;
+            }
+        }
+
+        // Apply Filters
+        function applyFilters() {
+            performSearch();
+            toggleFilterPanel();
+            showNotification('フィルターを適用しました');
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            document.getElementById('locationFilter').value = '';
+            document.getElementById('minWage').value = '';
+            document.getElementById('maxWage').value = '';
+            document.querySelectorAll('#filterPanel input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            performSearch();
+            showNotification('フィルターをリセットしました');
+        }
+
+        // Sort Results
+        function sortResults() {
+            const sortOrder = document.getElementById('sortOrder').value;
+            showNotification(`${sortOrder}で並び替えました`);
+            performSearch();
         }
 
         // Quick Apply with Animation
@@ -1769,13 +2502,16 @@
             });
         }
 
-        document.getElementById('investAmount').addEventListener('input', function(e) {
-            updateExpectedReturns(parseInt(e.target.value) || 0);
-        });
+                document.getElementById('investAmount').addEventListener('input', function(e) {
+                    updateExpectedReturns(parseInt(e.target.value) || 0);
+                });
 
         // Process Functions
         function processWithdraw() {
-            const amount = document.getElementById('withdrawAmount').value;
+            const amountElement = document.getElementById('withdrawAmount');
+            if (!amountElement) return;
+            
+            const amount = amountElement.value;
             if (!amount || amount <= 0) {
                 showNotification('出金額を入力してください');
                 return;
@@ -1786,7 +2522,10 @@
         }
 
         function processInvestment() {
-            const amount = document.getElementById('investAmount').value;
+            const amountElement = document.getElementById('investAmount');
+            if (!amountElement) return;
+            
+            const amount = amountElement.value;
             if (!amount || amount <= 0) {
                 showNotification('運用金額を入力してください');
                 return;
@@ -1821,15 +2560,94 @@
 
         // Other Modal Functions
         function showFilters() {
-            showNotification('詳細フィルター機能を開発中です');
+            toggleFilterPanel();
         }
 
         function showPaymentHistory() {
-            showNotification('取引履歴の詳細を表示します');
+            document.getElementById('transactionModal').classList.add('active');
+            loadTransactionHistory();
         }
 
         function showPaymentSettings() {
-            showNotification('支払い設定を開きます');
+            document.getElementById('paymentSettingsModal').classList.add('active');
+        }
+        
+        // Load Transaction History
+        function loadTransactionHistory() {
+            // Simulate loading
+            const list = document.getElementById('transactionList');
+            list.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                list.style.opacity = '1';
+                showNotification('取引履歴を読み込みました');
+            }, 300);
+        }
+        
+        // Filter Transactions
+        function filterTransactions(type) {
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter logic would go here
+            showNotification(`${type === 'all' ? 'すべて' : type === 'income' ? '収入' : type === 'withdraw' ? '出金' : '運用'}の取引を表示`);
+        }
+        
+        // Update Date Range
+        function updateDateRange() {
+            const range = document.getElementById('dateRange').value;
+            if (range === 'custom') {
+                showNotification('カスタム期間選択機能は開発中です');
+            } else {
+                loadTransactionHistory();
+            }
+        }
+        
+        // Download Statement
+        function downloadStatement() {
+            showNotification('明細書のダウンロードを開始します');
+            
+            // Simulate download
+            setTimeout(() => {
+                showNotification('明細書（PDF）をダウンロードしました');
+            }, 1500);
+        }
+        
+        // Toggle Auto Withdraw
+        function toggleAutoWithdraw() {
+            const checkbox = document.getElementById('autoWithdraw');
+            const settings = document.getElementById('autoWithdrawSettings');
+            
+            if (checkbox.checked) {
+                settings.style.display = 'block';
+                showNotification('自動出金を有効にしました');
+            } else {
+                settings.style.display = 'none';
+                showNotification('自動出金を無効にしました');
+            }
+        }
+        
+        // Bank Account Functions
+        function editBank(bankId) {
+            showNotification('口座情報の編集画面を開きます');
+        }
+        
+        function setAsMain(bankId) {
+            showNotification('メイン口座を変更しました');
+            // Update UI to reflect change
+        }
+        
+        function addNewBank() {
+            showNotification('新規口座登録画面を開きます');
+        }
+        
+        // Save Payment Settings
+        function savePaymentSettings() {
+            closeModal('paymentSettingsModal');
+            showNotification('支払い設定を保存しました');
         }
 
         function showSkillFund() {
@@ -1867,6 +2685,11 @@
         // Notification System
         function showNotification(message) {
             const notification = document.getElementById('notification');
+            if (!notification) {
+                console.error('Notification element not found');
+                return;
+            }
+            
             notification.textContent = message;
             notification.classList.add('show');
             
@@ -1906,7 +2729,10 @@
                 });
             }, 30000);
 
-            // Add swipe gestures (simplified)
+            // Initialize search when page loads
+            if (document.getElementById('work').classList.contains('active')) {
+                performSearch();
+            }
             let touchStartX = 0;
             let touchEndX = 0;
 
